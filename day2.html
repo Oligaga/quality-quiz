@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>质量月知识竞赛 - DAY 2</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Microsoft YaHei','PingFang SC',sans-serif;min-height:100vh;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);display:flex;align-items:center;justify-content:center;padding:20px}
+.container{width:100%;max-width:600px}
+.screen{display:none}.screen.active{display:block}
+.card{background:#fff;border-radius:20px;padding:40px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.badge{display:inline-block;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:6px 20px;border-radius:20px;font-size:14px;font-weight:bold;margin-bottom:20px}
+.title{font-size:28px;font-weight:bold;color:#333;margin-bottom:10px;text-align:center}
+.subtitle{font-size:16px;color:#888;text-align:center;margin-bottom:30px}
+.btn{display:block;width:100%;padding:15px;border:none;border-radius:12px;font-size:18px;font-weight:bold;cursor:pointer;transition:all .3s}
+.btn-primary{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(102,126,234,.4)}
+.btn-secondary{background:#f0f0f0;color:#666;margin-top:10px}
+.progress-bar{height:6px;background:#e0e0e0;border-radius:3px;margin-bottom:20px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(135deg,#667eea,#764ba2);transition:width .3s;border-radius:3px}
+.q-num{font-size:14px;color:#888;margin-bottom:8px}
+.q-text{font-size:18px;font-weight:bold;color:#333;margin-bottom:20px;line-height:1.6}
+.opts{list-style:none}
+.opt{padding:14px 18px;margin-bottom:10px;border:2px solid #e8e8e8;border-radius:12px;cursor:pointer;transition:all .2s;font-size:15px;line-height:1.5}
+.opt:hover{border-color:#667eea;background:#f8f7ff}
+.opt.correct{border-color:#52c41a;background:#f6ffed}
+.opt.wrong{border-color:#ff4d4f;background:#fff2f0}
+.opt.disabled{pointer-events:none}
+.opt-label{display:inline-block;width:24px;height:24px;line-height:24px;text-align:center;border-radius:50%;background:#f0f0f0;font-weight:bold;font-size:13px;margin-right:10px;color:#666}
+.opt.correct .opt-label{background:#52c41a;color:#fff}
+.opt.wrong .opt-label{background:#ff4d4f;color:#fff}
+.exp{margin-top:16px;padding:14px;background:#f9f9f9;border-radius:10px;font-size:14px;color:#555;line-height:1.6;display:none;border-left:4px solid #667eea}
+.exp.show{display:block}
+.next-btn{margin-top:16px;display:none}
+.next-btn.show{display:block}
+.score-circle{width:140px;height:140px;border-radius:50%;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;font-size:42px;font-weight:bold;color:#fff;background:linear-gradient(135deg,#667eea,#764ba2);box-shadow:0 10px 30px rgba(102,126,234,.4)}
+.result-msg{text-align:center;font-size:18px;color:#555;margin-bottom:10px}
+.result-detail{text-align:center;font-size:14px;color:#999;margin-bottom:24px}
+.review-item{background:#f9f9f9;border-radius:10px;padding:14px;margin-bottom:12px;text-align:left}
+.review-q{font-size:14px;font-weight:bold;color:#333;margin-bottom:6px;line-height:1.5}
+.review-a{font-size:13px;color:#555;line-height:1.5}
+.review-a span{display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;margin-right:6px}
+.review-a .right{background:#f6ffed;color:#52c41a}
+.review-a .miss{background:#fff2f0;color:#ff4d4f}
+</style>
+</head>
+<body>
+<div class="container">
+<div id="startScreen" class="screen active">
+<div class="card" style="text-align:center">
+<div class="badge">DAY 2</div>
+<div class="title">质量月知识竞赛</div>
+<div class="subtitle">原来这也是质量！</div>
+<p style="color:#999;font-size:14px;margin-bottom:24px;line-height:1.6">共20道题，每题5分，满分100分<br>测试用时约5分钟</p>
+<button id="startBtn" class="btn btn-primary">开始答题</button>
+</div>
+</div>
+<div id="quizScreen" class="screen">
+<div class="card">
+<div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div>
+<div id="qNum" class="q-num"></div>
+<div id="qText" class="q-text"></div>
+<ul id="optsList" class="opts"></ul>
+<div id="expPanel" class="exp"></div>
+<button id="nextBtn" class="btn btn-primary next-btn">下一题</button>
+</div>
+</div>
+<div id="resultScreen" class="screen">
+<div class="card" style="text-align:center">
+<div class="score-circle" id="scoreCircle"></div>
+<div id="resultMsg" class="result-msg"></div>
+<div id="resultDetail" class="result-detail"></div>
+<button id="reviewBtn" class="btn btn-primary">查看解析</button>
+<button id="retryBtn" class="btn btn-secondary">再来一次</button>
+</div>
+</div>
+<div id="reviewScreen" class="screen">
+<div class="card">
+<div class="title" style="font-size:20px;margin-bottom:16px">答题回顾</div>
+<div id="reviewList"></div>
+<button id="backBtn" class="btn btn-primary" style="margin-top:16px">返回首页</button>
+</div>
+</div>
+</div>
+<script>
+const questions=[{"q": "为什么“价格最低”的供应商不一定是总体成本最低的供应商？", "opts": ["低价可能伴随质量和交付风险", "低价供应商一定没有能力", "价格低一定意味着产品差", "价格和质量没有关系"], "ans": 0, "exp": "价格只是供应商评价的一个维度，单纯追求最低价格可能忽略质量、交付和稳定性风险。"}, {"q": "为什么供应商发生重大变更时，需要进行质量风险评估？", "opts": ["变更可能影响产品质量或稳定性", "所有变更都会导致质量下降", "这是为了增加流程", "因为供应商不能改变任何东西"], "ans": 0, "exp": "供应商发生重大变更后，材料、工艺、人员或管理方式可能变化，因此需要提前评估质量风险。"}, {"q": "“可追溯性”主要解决什么问题？", "opts": ["产品卖了多少钱", "产品从哪里来、经过什么环节、去了哪里", "谁销售了产品", "产品广告在哪里投放"], "ans": 1, "exp": "质量追溯的核心就是能够查清产品的来源、经过的关键环节以及最终流向。"}, {"q": "如果品牌宣传承诺与产品实际体验存在明显差距，最可能带来：", "opts": ["客户预期落差", "客诉增加", "品牌信任下降", "以上都是"], "ans": 3, "exp": "当品牌宣传形成的预期与实际体验存在较大差距时，可能同时带来投诉和用户信任下降。"}, {"q": "为什么“客户声音”（VOC）对质量改善很重要？", "opts": ["能帮助了解真实用户需求和问题", "只是客服部门的数据", "只能用来统计投诉数量", "不能用于产品改善"], "ans": 0, "exp": "VOC能够帮助企业获得真实用户的需求、体验和问题，是产品及服务改善的重要输入。"}, {"q": "客户反馈“产品功能没有问题，但是使用起来很麻烦”，这算不算质量问题？", "opts": ["不算，因为产品功能正常", "算，可能属于用户体验质量问题", "只属于销售问题", "只属于客服问题"], "ans": 1, "exp": "产品功能正常并不代表整体质量没有问题，使用是否方便也是用户体验质量的重要组成部分。"}, {"q": "如果客户频繁询问同一个产品问题，最好的做法是：", "opts": ["每次单独回答客户", "让客服自己记住答案", "将问题反馈并推动相关部门分析", "不再回答这个问题"], "ans": 2, "exp": "同一个问题被频繁询问，可能反映产品信息、说明或使用体验存在共性改善空间。"}, {"q": "如果一个产品销量越来越高，同时质量投诉数量也越来越高，应该优先关注：", "opts": ["投诉绝对数量", "销量绝对数量", "投诉率及变化趋势", "只看销售额"], "ans": 2, "exp": "当业务规模变化时，单看投诉数量容易产生误判，更应该结合投诉率和变化趋势判断质量状况。"}, {"q": "为什么设计阶段就需要考虑质量风险？", "opts": ["设计决策会影响后续制造和使用", "后期发现问题通常修改成本更高", "可以提前降低风险", "以上都是"], "ans": 3, "exp": "设计会影响后续制造和用户使用，越早识别并解决风险，通常成本越低、效果越好。"}, {"q": "代工生产模式下，品牌方是否可以认为“产品质量是代工厂的事情”？", "opts": ["可以", "不可以", "只要签了合同就可以", "只有出了问题才不可以"], "ans": 1, "exp": "即使采用代工模式，最终产品仍以品牌方身份面对消费者，因此质量不能简单归为代工厂单方责任。"}, {"q": "供应商报价降低10%，但因为质量异常导致返工、退货和延期，最终可能出现什么情况？", "opts": ["总成本一定下降10%", "采购价格下降，但综合成本反而可能上升", "质量成本与采购价格无关", "只要采购价格低就是更优选择"], "ans": 1, "exp": "解析： 供应商的真实成本不仅是采购价格，还包括质量、交付、返工、售后等后续成本。"}, {"q": "为什么产品包装也属于质量的一部分，而不仅仅是“好不好看”？", "opts": ["包装只影响品牌形象", "包装还承担保护、识别、信息传递等功能", "包装越贵质量越好", "包装和产品质量完全无关"], "ans": 1, "exp": "解析： 包装不仅影响视觉体验，还可能直接影响运输保护、产品识别和用户正确使用。"}, {"q": "某产品投诉率从0.1%升到0.2%，看起来只增加了0.1个百分点，但如果销量扩大10倍，意味着什么？", "opts": ["实际影响一定没有变化", "需要同时关注投诉率和实际投诉数量", "只看投诉率即可", "只看投诉数量即可"], "ans": 1, "exp": "解析： 相对指标和绝对数量反映不同维度，业务规模变化后需要结合两者判断真实质量影响。"}, {"q": "品牌宣传中把产品能力描述得非常“完美”，为什么反而可能增加风险？", "opts": ["宣传越好销量越差", "过高的用户预期会放大实际体验与承诺之间的差距", "用户不喜欢广告", "产品一定会因此变差"], "ans": 1, "exp": "解析： 质量体验不仅取决于产品实际表现，还取决于用户预期，承诺越高，体验落差可能越明显。"}, {"q": "客户说：“你们竞争对手都能做到，为什么你们不能？”销售此时最不应该做的是：", "opts": ["了解客户真正需求", "内部确认可行性", "为了拿下订单直接承诺", "与相关部门评估风险"], "ans": 2, "exp": "解析： 客户的要求值得争取，但不能用未经确认的承诺换订单，否则短期赢了客户，后面可能输掉口碑。"}, {"q": "市场团队想在宣传中使用“100%不会出现XX问题”的表述，但目前没有充分数据支持。应该：", "opts": ["只要营销效果好就可以用", "改成有事实和数据支撑的表达", "加一句“小概率除外”即可", "先发布，收到投诉再改"], "ans": 1, "exp": "解析： 宣传语言也需要建立在真实、可验证的产品能力上，过度承诺最终可能变成客户投诉。"}, {"q": "某供应商送来的样品表现非常好，但进入量产后质量却不稳定。这个案例最值得关注的是：", "opts": ["样品没必要做", "供应商是不是故意的", "样品与量产之间是否存在工艺、材料或过程差异", "以后都不要这个供应商"], "ans": 2, "exp": "解析： 样品好不代表量产一定稳定，真正需要确认的是“样品怎么做出来的”和“量产能不能持续做出来”。"}, {"q": "研发发现某个风险发生概率很低，但一旦发生可能造成较严重后果。应该：", "opts": ["概率低，所以不用管", "只看过去有没有发生过", "同时考虑发生概率和后果严重程度", "等客户反馈后再处理"], "ans": 2, "exp": "解析： 质量风险不能只看“发生概率”，低概率但高影响的问题同样值得提前识别和预防。"}, {"q": "一个跨部门项目出现问题后，大家都说：“我以为XX部门已经确认了。”这类问题最值得反思的是：", "opts": ["谁的责任最大", "为什么大家都以为别人会确认，却没人真正确认", "下次让质量部全部负责", "以后少做跨部门项目"], "ans": 1, "exp": "解析： 很多质量问题并不是某个人故意做错，而是关键事项没有明确谁确认、确认什么、确认到什么程度。"}, {"q": "为了赶客户交期，有人提出：“这个流程平时都做，今天先跳过一次，应该没问题。”最合理的做法是：", "opts": ["紧急订单可以直接跳过", "只要以前没出过问题就可以", "先判断这个步骤存在的目的和风险，再决定是否可以调整", "只要领导口头同意就跳过"], "ans": 2, "exp": "解析： 流程不是不能优化，但不能因为“赶时间”就默认某个控制点没有价值，应该先搞清楚它到底在防什么风险。"}];
+const labels='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+let cur=0,score=0,userAns=[];
+const $=id=>document.getElementById(id);
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(id).classList.add('active')}
+function renderQ(){
+const q=questions[cur];
+$('qNum').textContent='第 '+(cur+1)+' / '+questions.length+' 题';
+$('qText').textContent=q.q;
+$('progressFill').style.width=((cur)/questions.length*100)+'%';
+const ul=$('optsList');ul.innerHTML='';
+q.opts.forEach((o,i)=>{
+const li=document.createElement('li');
+li.className='opt';
+li.innerHTML='<span class="opt-label">'+labels[i]+'</span>'+o;
+li.addEventListener('click',function(){selectOpt(i)});
+ul.appendChild(li);
+});
+$('expPanel').className='exp';$('expPanel').textContent='';
+$('nextBtn').className='btn btn-primary next-btn';
+}
+function selectOpt(i){
+const q=questions[cur];
+userAns[cur]=i;
+const items=$('optsList').querySelectorAll('.opt');
+items.forEach(it=>it.classList.add('disabled'));
+items[q.ans].classList.add('correct');
+if(i===q.ans){score+=5}else{items[i].classList.add('wrong')}
+$('expPanel').textContent='解析：'+q.exp;
+$('expPanel').className='exp show';
+$('nextBtn').className='btn btn-primary next-btn show';
+}
+function showResult(){
+$('progressFill').style.width='100%';
+$('scoreCircle').textContent=score;
+const wrong=questions.length-score/5;
+$('resultDetail').textContent='答对 '+score/5+' 题，答错 '+wrong+' 题';
+let msg='';
+if(score>=90)msg='太棒了！质量知识掌握扎实！';
+else if(score>=70)msg='不错！继续加油！';
+else if(score>=50)msg='还有提升空间，再学习一下吧！';
+else msg='加油！建议重新学习质量知识哦！';
+$('resultMsg').textContent=msg;
+show('resultScreen');
+}
+function showReview(){
+const list=$('reviewList');list.innerHTML='';
+questions.forEach((q,i)=>{
+const ua=userAns[i];
+const isRight=ua===q.ans;
+const div=document.createElement('div');
+div.className='review-item';
+let h='<div class="review-q">'+(i+1)+'. '+q.q+'</div><div class="review-a">';
+h+='<span class="right">正确: '+labels[q.ans]+' '+q.opts[q.ans]+'</span>';
+if(!isRight&&ua!==undefined){h+=' <span class="miss">你的答案: '+labels[ua]+' '+q.opts[ua]+'</span>'}
+else if(ua===undefined){h+=' <span class="miss">未答</span>'}
+h+='</div>';
+div.innerHTML=h;
+list.appendChild(div);
+});
+show('reviewScreen');
+}
+function reset(){cur=0;score=0;userAns=[];renderQ();show('quizScreen')}
+$('startBtn').addEventListener('click',function(){renderQ();show('quizScreen')});
+$('nextBtn').addEventListener('click',function(){cur++;if(cur<questions.length){renderQ()}else{showResult()}});
+$('reviewBtn').addEventListener('click',showReview);
+$('retryBtn').addEventListener('click',function(){reset();show('startScreen')});
+$('backBtn').addEventListener('click',function(){show('startScreen')});
+</script>
+</body>
+</html>
